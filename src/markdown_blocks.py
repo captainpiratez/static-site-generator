@@ -1,5 +1,6 @@
 from enum import Enum
 import re
+from htmlnode import *
 
 
 class BlockType(Enum):
@@ -9,6 +10,26 @@ class BlockType(Enum):
     QUOTE = "quote"
     ULIST = "unordered_list"
     OLIST = "ordered_list"
+
+
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        match block_type:
+            case BlockType.HEADING:
+                html = HTML
+                pass
+            case BlockType.CODE:
+                pass
+            case BlockType.QUOTE:
+                pass
+            case BlockType.ULIST:
+                pass
+            case BlockType.OLIST:
+                pass
+            case BlockType.PARAGRAPH:
+                pass
 
 
 def markdown_to_blocks(markdown):
