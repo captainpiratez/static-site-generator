@@ -14,11 +14,12 @@ class BlockType(Enum):
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
+    html = HTMLNode("div")
     for block in blocks:
         block_type = block_to_block_type(block)
         match block_type:
             case BlockType.HEADING:
-                html = HTML
+                html = HTMLNode("h1")
                 pass
             case BlockType.CODE:
                 pass
@@ -61,3 +62,39 @@ def block_to_block_type(markdown):
         else:
             return BlockType.OLIST
     return BlockType.PARAGRAPH
+
+
+def heading_to_html_node(markdown):
+    if markdown.startswith(("# ")):
+        tag = "h1"
+        text = markdown[2:]
+    elif markdown.startswith(("## ")):
+        tag = "h2"
+        text = markdown[3:]
+    elif markdown.startswith(("### ")):
+        tag = "h3"
+        text = markdown[4:]
+    elif markdown.startswith(("#### ")):
+        tag = "h4"
+        text = markdown[5:]
+    elif markdown.startswith(("##### ")):
+        tag = "h5"
+        text = markdown[6:]
+    elif markdown.startswith(("###### ")):
+        tag = "h6"
+        text = markdown[7:]
+    else:
+        raise Exception("invalid heading")
+    return HTMLNode(tag, text)
+
+
+def text_to_children(text):
+    nodes = []
+    # Use your inline markdown parsing function to split text into TextNodes
+    text_nodes = parse_inline_markdown(text)
+    # For each TextNode, convert to HTMLNode
+    for t_node in text_nodes:
+        html_node = text_node_to_html_node(t_node)
+        nodes.append(html_node)
+    return nodes
+    
