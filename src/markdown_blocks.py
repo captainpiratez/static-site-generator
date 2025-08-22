@@ -85,8 +85,7 @@ def heading_to_html_node(markdown):
         text = markdown[7:]
     else:
         raise Exception("invalid heading")
-    return HTMLNode(tag, text)
-
+    return HTMLNode(tag, children=text_to_children(text))
 
 def text_to_children(text):
     nodes = []
