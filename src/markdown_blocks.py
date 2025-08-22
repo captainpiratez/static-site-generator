@@ -97,3 +97,10 @@ def text_to_children(text):
         nodes.append(html_node)
     return nodes
     
+
+def parse_inline_markdown(markdown):
+    pass
+
+
+def text_node_to_html_node(t_node):
+    pass
