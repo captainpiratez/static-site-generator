@@ -1,7 +1,8 @@
 from enum import Enum
 import re
 from htmlnode import *
-
+from textnode import *
+from inline_markdown import text_to_textnodes
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -15,22 +16,29 @@ class BlockType(Enum):
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     html = HTMLNode("div")
+    children = []
     for block in blocks:
         block_type = block_to_block_type(block)
         match block_type:
             case BlockType.HEADING:
-                html = HTMLNode("h1")
-                pass
+                heading_node = heading_to_html_node(block)
+                children.append(heading_node)
             case BlockType.CODE:
-                pass
+                code_node = code_to_html_node(block)
+                children.append(code_node)
             case BlockType.QUOTE:
-                pass
+                quote_node = quote_to_html_node(block)
+                children.append(quote_node)
             case BlockType.ULIST:
-                pass
+                ulist_node = ulist_to_html_node(block)
+                children.append(ulist_node)
             case BlockType.OLIST:
-                pass
+                olist_node = olist_to_html_node(block)
+                children.append(olist_node)
             case BlockType.PARAGRAPH:
-                pass
+                paragraph_node = paragraph_to_html_node(block)
+                children.append(paragraph_node)
+    return ParentNode("div", children)
 
 
 def markdown_to_blocks(markdown):
@@ -85,13 +93,75 @@ def heading_to_html_node(markdown):
         text = markdown[7:]
     else:
         raise Exception("invalid heading")
-    return HTMLNode(tag, children=text_to_children(text))
+    return ParentNode(tag, text_to_children(text))
+
+
+def code_to_html_node(block):
+    text = block[4:-3]  # ``` kısımlarını çıkar
+    # LeafNode kullan çünkü code tag'inin içinde sadece text var
+    code_node = LeafNode("code", text)
+    # ParentNode kullan çünkü pre tag'inin içinde child var
+    return ParentNode("pre", [code_node])
+
+
+
+def paragraph_to_html_node(paragraph):
+    # Satır sonlarını boşluklarla değiştir
+    lines = paragraph.split("\n")
+    text = " ".join(lines)
+    return ParentNode("p", text_to_children(text))
+
+
+def quote_to_html_node(block):
+    lines = block.split("\n")  # Satırlara böl
+    cleaned_lines = []
+    for line in lines:
+        # Her satırdan > ve boşluğu çıkar
+        cleaned_line = line.lstrip("> ")  # > ve boşlukları temizle
+        cleaned_lines.append(cleaned_line)
+    
+    # Satırları birleştir
+    text = " ".join(cleaned_lines)
+    return ParentNode("blockquote", text_to_children(text))
+
+
+def ulist_to_html_node(block):
+    lines = block.split("\n")  # Satırlara böl
+    list_items = []
+    
+    for line in lines:
+        # Her satırdan "- " kısmını çıkar
+        text = line[2:]  # "- " kısmını çıkar
+        # Her item için <li> oluştur
+        li_node = ParentNode("li", text_to_children(text))
+        list_items.append(li_node)
+    
+    # Tüm li'ları ul içine koy
+    return ParentNode("ul", list_items)
+
+
+def olist_to_html_node(block):
+    lines = block.split("\n")
+    list_items = []
+    
+    for line in lines:
+        # Her satırdan "1. ", "2. " vs kısmını çıkar
+        # Nokta ve boşluğu bul
+        dot_index = line.find(". ")
+        text = line[dot_index + 2:]  # ". " sonrasını al
+        
+        # Her item için <li> oluştur
+        li_node = ParentNode("li", text_to_children(text))
+        list_items.append(li_node)
+    
+    # Tüm li'ları ol içine koy
+    return ParentNode("ol", list_items)
+
 
 def text_to_children(text):
     nodes = []
     # Use your inline markdown parsing function to split text into TextNodes
-    text_nodes = parse_inline_markdown(text)
-    # For each TextNode, convert to HTMLNode
+    text_nodes = text_to_textnodes(text)
     for t_node in text_nodes:
         html_node = text_node_to_html_node(t_node)
         nodes.append(html_node)
@@ -99,8 +169,12 @@ def text_to_children(text):
     
 
 def parse_inline_markdown(markdown):
-    pass
-
-
-def text_node_to_html_node(t_node):
-    pass
+    # Split on backticks (will give you alternating non-code/code)
+    parts = re.split(r"(`[^`]+`)", markdown)
+    nodes = []
+    for part in parts:
+        if part.startswith("`") and part.endswith("`"):
+            nodes.append(TextNode(part[1:-1], "code"))  # remove backticks
+        else:
+            nodes.append(TextNode(part, "text"))
+    return nodes
