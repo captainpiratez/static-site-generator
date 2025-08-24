@@ -146,10 +146,10 @@ the **same** even with inline stuff
 2. Second item with _italic_
 3. Third item
 """
-    node = markdown_to_html_node(md)
-    html = node.to_html()
-    expected = "<div><ol><li>First item</li><li>Second item with <i>italic</i></li><li>Third item</li></ol></div>"
-    self.assertEqual(html, expected)
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><ol><li>First item</li><li>Second item with <i>italic</i></li><li>Third item</li></ol></div>"
+        self.assertEqual(html, expected)
 
 if __name__ == "__main__":
     unittest.main()
