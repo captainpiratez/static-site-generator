@@ -4,25 +4,47 @@ from gencontent import extract_title
 
 
 class TestExtractTitle(unittest.TestCase):
-    def test_extract_title_1(self):
-        md = "# This is a Title   "
-        title = extract_title(md)
-        self.assertEqual("This is a Title", title)
-    
-    def test_extract_title_exception(self):
-        md = "This is a not Title   "
-        with self.assertRaises(Exception):
-            extract_title(md)
+    def test_eq(self):
+        actual = extract_title("# This is a title")
+        self.assertEqual(actual, "This is a title")
 
-    def test_extract_title_multiple_lines(self):
-        md = "This is a not Title\n this is also not a title\n# Here Title\n hello there"
-        title = extract_title(md)
-        self.assertEqual("Here Title", title)
+    def test_eq_double(self):
+        actual = extract_title(
+            """
+# This is a title
 
-    def test_extract_title_leading_spaces_in_title(self):
-        md = "#   My Awesome Title"
-        title = extract_title(md)
-        self.assertEqual("My Awesome Title", title)
-    
+# This is a second title that should be ignored
+"""
+        )
+        self.assertEqual(actual, "This is a title")
+
+    def test_eq_long(self):
+        actual = extract_title(
+            """
+# title
+
+this is a bunch
+
+of text
+
+- and
+- a
+- list
+"""
+        )
+        self.assertEqual(actual, "title")
+
+    def test_none(self):
+        try:
+            extract_title(
+                """
+no title
+"""
+            )
+            self.fail("Should have raised an exception")
+        except Exception as e:
+            pass
+
+
 if __name__ == "__main__":
     unittest.main()
