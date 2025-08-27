@@ -99,32 +99,3 @@ img {
   border: 3px solid #3c3c42;
   box-shadow: 3px 3px 6px #000;
 }
-
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1f1c25;
-  border-radius: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #3c3c42;
-  border-radius: 6px;
-  border: 3px solid #1f1c25;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #5a5466;
-}
-
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #3c3c42 #1f1c25;
-}
-
-::-webkit-scrollbar-corner {
-  background: #1f1c25;
-}
